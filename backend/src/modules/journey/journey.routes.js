@@ -13,15 +13,20 @@ import {
 } from './journey.controller.js';
 import { authenticate, authorizeRole } from '../../common/middleware/auth.middleware.js';
 import { validate } from '../../common/middleware/auth.validate.js';
-import {
-    createJourneySchema,
-    updateJourneyStatusSchema,
-    completeJourneySchema,
-    cancelJourneySchema
+
+import { createJourneySchema, updateJourneyStatusSchema, completeJourneySchema, cancelJourneySchema
 } from './journey.validation.js';
 
 const router = express.Router();
-
+/*
+## Fare Kaise Calculate Hoga
+Distance = Haversine formula se pickup aur dropoff ke beech
+CAR:
+  Base = ₹50
+  Per KM = ₹12
+Agar distance = 3.5 KM:
+  Fare = 50 + (3.5 × 12) = 50 + 42 = ₹92
+*/ 
 router.post(
     '/create',
     authenticate,                           
@@ -29,23 +34,31 @@ router.post(
     createJourney                           
 );
 
-router.get(
-    '/:journeyId',
-    authenticate,                           
-    getJourneyById                          
-);
-
-router.get(
-    '/rider/history',
-    authenticate,                        
-    getRiderJourneys                      
-);
 
 router.post(
-    '/:journeyId/cancel',
+    '/:journeyId/accept',
     authenticate,                          
-    validate(cancelJourneySchema),          
-    cancelJourney                         
+    authorizeRole('DRIVER'),               
+    acceptJourney                          
+);
+
+/*
+ACCEPTED → STARTED ❌ (Direct nahi ho sakta!)
+ACCEPTED → ARRIVED → STARTED ✅ (Sahi order)
+*/ 
+
+router.patch(
+    '/:journeyId/status',
+    authenticate,                          
+    validate(updateJourneyStatusSchema),   
+    updateJourneyStatus                   
+)
+
+router.post(
+    '/:journeyId/complete',
+    authenticate,                         
+    validate(completeJourneySchema),       
+    completeJourney                         
 );
 
 router.get(
@@ -60,25 +73,25 @@ router.post(
     confirmPayment                         
 );
 
-router.post(
-    '/:journeyId/accept',
-    authenticate,                          
-    authorizeRole('DRIVER'),               
-    acceptJourney                          
-);
-
-router.patch(
-    '/:journeyId/status',
-    authenticate,                          
-    validate(updateJourneyStatusSchema),   
-    updateJourneyStatus                   
-);
 
 router.post(
-    '/:journeyId/complete',
-    authenticate,                         
-    validate(completeJourneySchema),       
-    completeJourney                         
+    '/:journeyId/cancel',
+    authenticate,                          
+    validate(cancelJourneySchema),          
+    cancelJourney                         
+);
+
+// ye baki ke aips hain
+router.get(
+    '/:journeyId',
+    authenticate,                           
+    getJourneyById                          
+);
+
+router.get(
+    '/rider/history',
+    authenticate,                        
+    getRiderJourneys                      
 );
 
 router.get(
