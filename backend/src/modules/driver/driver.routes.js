@@ -17,18 +17,23 @@ import {
   updateStatusSchema,
 } from "./driver.validation.js";
 const router = express.Router();
+
+
 router.post(
   "/register",
   authenticate,
   validate(createDriverProfileSchema),
   createProfile,
 );
+
+
 router.get(
   "/me/completion",
   authenticate,
   authorizeRole("DRIVER"),
   getProfileCompletion,
 );
+
 router.patch(
   "/me/status",
   authenticate,
@@ -36,6 +41,7 @@ router.patch(
   validate(updateStatusSchema),
   updateStatus,
 );
+
 router.get("/me", authenticate, authorizeRole("DRIVER"), getProfile);
 
 router.patch(
@@ -45,4 +51,5 @@ router.patch(
   validate(updateDriverProfileSchema),
   updateProfile,
 );
+
 export default router;

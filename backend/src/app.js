@@ -4,7 +4,8 @@ import { swaggerSpec } from './config/swagger.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import profileRoutes from './modules/profile/profile.routes.js';
 import driverRoutes from './modules/driver/driver.routes.js';
-
+import journeyRoutes from './modules/journey/journey.routes.js';
+import morgan from 'morgan'
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     url: '/api-docs/json'
   }
 }));
+app.use(morgan('dev'))
 
 app.get('/api-docs/json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -29,5 +31,5 @@ app.get('/health', (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/driver",driverRoutes);
-
+app.use("/api/journey", journeyRoutes);
 export default app;

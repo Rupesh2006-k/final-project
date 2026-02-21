@@ -145,9 +145,6 @@ const driverSchema = new mongoose.Schema(
   },
 );
 
-driverSchema.index({ location: "2dsphere" });
-
-driverSchema.index({ userId: 1 });
 
 driverSchema.pre("save", function () {
   if (
