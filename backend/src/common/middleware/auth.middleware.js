@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { env } from "../../config/env.js";
 import { User } from "../../modules/model/user.model.js";
-
+import { authService } from "../../modules/auth/auth.service.js";
 export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -13,6 +13,14 @@ export const authenticate = async (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
+
+  // ✅ Blacklisted token check karo
+  if (authService.isTokenBlacklisted(token)) {
+    return res.status(401).json({
+      success: false,
+      message: "Token has been invalidated. Please login again.",
+    });
+  }
 
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);

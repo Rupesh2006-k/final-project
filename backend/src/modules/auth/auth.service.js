@@ -1,5 +1,7 @@
 import { User } from "../model/user.model.js";
 
+const blacklistedTokens = new Set();
+
 class AuthService {
   async signup(userData) {
     try {
@@ -46,7 +48,6 @@ class AuthService {
       }
 
       const isPasswordValid = await user.comparePassword(password);
-
       if (!isPasswordValid) {
         throw new Error("Invalid credentials password invalid");
       }
@@ -72,6 +73,19 @@ class AuthService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async logout(token) {
+    if (!token) {
+      throw new Error("No token provided");
+    }
+    blacklistedTokens.add(token);
+    return { message: "Logged out successfully" };
+  }
+
+  // ✅ Token blacklisted hai ya nahi check karo
+  isTokenBlacklisted(token) {
+    return blacklistedTokens.has(token);
   }
 }
 
